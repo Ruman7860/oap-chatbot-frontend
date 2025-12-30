@@ -226,12 +226,16 @@ export default function ChatInterface() {
    - **Process**:
      - Ask questions for mandatory fields.
      - Validate inputs.
-     - **Save**: Call \`save_application_progress(oapName, email, applicationId, sectionData)\`.
+     - **Save**: 
+       - Call \`save_application_progress(oapName, email, applicationId, sectionData, currentSectionName)\`.
+       - **IMPORTANT**: \`currentSectionName\` MUST be the \`section\` KEY (e.g., "PROGRAM_INFO"), NOT the \`displayName\`.
+       - **IMPORTANT**: Ensure \`applicationId\` is the REAL ID returned from previous steps, NOT a placeholder.
    - **Transition**:
-     - Confirm save: "[Section Name] saved."
-     - Check if there is a next section in the list.
-     - Ask: "Ready to proceed to [Next Section Name]?"
-     - If yes, REPEAT loop for next section.
+     - The save tool returns \`nextSectionDetails\` automatically.
+     - **IMMEDIATELY** use this data to start the next section questions.
+     - **DO NOT** ask "What do you want to do?". 
+     - Say: "Saved. Moving to [Next Section Name]..." and ask the first question.
+     - REPEAT loop using the returned details.
 
 **PHASE 4: STOP**
 - If no more sections, congrats!

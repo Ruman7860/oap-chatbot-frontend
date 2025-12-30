@@ -6,7 +6,7 @@ export class MCPClient {
   private transport: SSEClientTransport | null = null;
   private isConnected: boolean = false;
 
-  constructor(serverUrl: string = "http://localhost:3000/sse") {
+  constructor(serverUrl: string = process.env.NEXT_PUBLIC_MCP_SERVER_URL || "http://localhost:4000/sse") {
     this.client = new Client(
       {
         name: "oap-chatbot-frontend",
