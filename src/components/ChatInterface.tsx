@@ -28,6 +28,8 @@ export default function ChatInterface() {
   
   // Ref to scroll to bottom
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  // Ref to track if we are creating a new chat to prevent race condition
+  const isNewChatRef = useRef<string | null>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -54,6 +56,11 @@ export default function ChatInterface() {
   // Load Messages when Chat Selected
   useEffect(() => {
     if (currentChatId) {
+        // If this is the chat we just created, don't reload (to preserve optimistic state)
+        if (isNewChatRef.current === currentChatId) {
+            isNewChatRef.current = null; // Reset
+            return;
+        }
         loadMessages(currentChatId);
     } else {
         setMessages([]);
@@ -62,8 +69,6 @@ export default function ChatInterface() {
 
   const loadMessages = async (chatId: string) => {
       try {
-          // Temporarily keep messages if switching to simplify transition or clear?
-          // Let's clear to avoid confusion
           setMessages([]);
           const chatDetail = await chatService.getChat(chatId);
           // Map backend messages to frontend format
@@ -132,6 +137,10 @@ export default function ChatInterface() {
       if (!activeChatId) {
           const newChat = await chatService.createChat(inputValue.substring(0, 30) + "...");
           activeChatId = newChat.id;
+          
+          // Mark this as a new chat to prevent useEffect from clearing messages
+          isNewChatRef.current = newChat.id;
+          
           setCurrentChatId(newChat.id);
           setChats(prev => [newChat, ...prev]);
       }
