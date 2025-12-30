@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:4000';
+const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000';
 
 export interface Chat {
     id: string;
